@@ -2,7 +2,6 @@ from django.test import TestCase
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
 
-# Create your tests here.
 class SnippetSerializerTests(TestCase):
     def test_serialize_snippet(self):
         snippet = Snippet.objects.create(code="print('hello, world')")
