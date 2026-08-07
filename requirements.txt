@@ -1,0 +1,4 @@
+Django==5.x
+djangorestframework==3.x
+Pygments==2.x
+python-decouple==3.8
