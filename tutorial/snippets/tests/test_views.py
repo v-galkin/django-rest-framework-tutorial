@@ -1,15 +1,19 @@
 import json
 from django.test import TestCase
+from django.contrib.auth.models import User
 from snippets.models import Snippet
 
 class SnippetViewTests(TestCase):
     def setUp(self):
+        self.owner = User.objects.create_user(username="user", password="pass123")
         self.snippet = Snippet.objects.create(
+            owner=self.owner,
             title = "Test title",
             code = "print('Test Code Snippet')",
             language = "python",
             style = "friendly"
         )
+        self.client.force_login(user=self.owner)
 
     def test_list_snippets_get(self):
         response = self.client.get("/snippets/")
@@ -26,10 +30,10 @@ class SnippetViewTests(TestCase):
         self.assertEqual(response.status_code, 201)
 
     def test_get_snippet_detail_not_found(self):
-        response = self.client.get("/snippets/9999")
+        response = self.client.get("/snippets/9999/")
         self.assertEqual(response.status_code, 404)
 
     def test_delete_snippet(self):
-        response = self.client.delete(f"/snippets/{self.snippet.pk}")
+        response = self.client.delete(f"/snippets/{self.snippet.pk}/")
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Snippet.objects.count(), 0)
