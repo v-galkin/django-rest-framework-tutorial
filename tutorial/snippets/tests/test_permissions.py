@@ -23,7 +23,7 @@ class SnippetPermissionTests(APITestCase):
     def test_anonymous_cannot_create_snippet(self):
         payload = {"code": "print(1)", "langauge": "python", "style": "friendly"}
         response = self.client.post("/snippets/", payload, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_auth_user_can_create_snippet(self):
         self.client.force_login(self.owner)
@@ -39,7 +39,7 @@ class SnippetPermissionTests(APITestCase):
             {"code": "updated", "language": "python", "style": "friendly"},
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_owner_can_update_snippet(self):
         self.client.force_login(self.owner)
@@ -64,13 +64,14 @@ class SnippetPermissionTests(APITestCase):
     # --- Delete: owner only ---
     def test_anonymous_cannot_delete_snippet(self):
         response = self.client.delete(f"/snippets/{self.snippet.pk}/")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertTrue(Snippet.objects.filter(pk=self.snippet.pk).exists)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(Snippet.objects.filter(pk=self.snippet.pk).exists())
     def test_non_owner_cannot_delete_snippet(self):
         self.client.force_login(self.other)
         response = self.client.delete(f"/snippets/{self.snippet.pk}/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(Snippet.objects.filter(pk=self.snippet.pk).exists)
+        
 
     def test_owner_can_delete_snippet(self):
         self.client.force_login(self.owner)
