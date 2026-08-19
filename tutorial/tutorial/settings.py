@@ -168,3 +168,6 @@ if not CORS_ALLOW_ALL_ORIGINS:
         default='',
         cast=lambda v: [s.strip() for s in v.split(',') if s.strip()]
     )
+
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
