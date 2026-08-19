@@ -50,3 +50,21 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
         run: python manage.py test snippets
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Deploy to Oracle Cloud VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd ~/django-rest-framework-tutorial
+            git pull origin main
+            cd tutorial
+            docker compose up -d --build
